@@ -1,0 +1,6 @@
+@Globomantics.API_HostAddress = http://localhost:5094
+
+GET {{Globomantics.API_HostAddress}}
+Accept: application/json
+
+###
