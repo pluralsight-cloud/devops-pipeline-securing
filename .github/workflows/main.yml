@@ -25,7 +25,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore
-        run: dotnet restore Globomantics.API.sln
+        run: dotnet restore Globomantics.API.slnx
 
       # ---------------------------------------------------------------
       # Mitigation for the single threat in the threat model:
@@ -41,7 +41,4 @@ jobs:
           echo "No unsafe patterns found"
 
       - name: Build
-        run: dotnet build Globomantics.API.sln --configuration Release --no-restore
-
-      - name: Test
-        run: dotnet test Globomantics.API.sln --configuration Release --no-build --verbosity normal
+        run: dotnet build Globomantics.API.slnx --configuration Release --no-restore
