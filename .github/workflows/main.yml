@@ -34,7 +34,7 @@ jobs:
       # ---------------------------------------------------------------
       - name: Check for unsafe input handling
         run: |
-          if grep -rE "LIKE '%\" \+ .* \+ \"%'" --include='*.cs' Globomantics.API/ ; then
+          if grep -rE "LIKE '%\" \+ .* \+ \"%'" --include='*.cs'; then
             echo "Unsafe pattern detected: user input concatenated into a query string"
             exit 1
           fi
