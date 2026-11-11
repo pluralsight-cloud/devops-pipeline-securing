@@ -42,20 +42,6 @@ public class ItemsController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
     }
-
-    // -------------------------------------------------------------------------
-    // DEMO ONLY: Uncomment the method below to make the CI check fail.
-    // This demonstrates the threat described in threat-model.md.
-    // -------------------------------------------------------------------------
-
-    //[HttpGet("search")]
-    //public ActionResult Search(string query)
-    //{
-    //    // Unsafe: concatenating user input into a query-like string
-    //    var sql = "SELECT * FROM Items WHERE Name LIKE '%" + query + "%'";
-    //    return Ok(new { warning = $"This would have executed this query: '{ sql}'", sql });
-    //}
-
 }
 
 public class Item
