@@ -48,13 +48,13 @@ public class ItemsController : ControllerBase
     // This demonstrates the threat described in threat-model.md.
     // -------------------------------------------------------------------------
 
-    [HttpGet("search")]
-    public ActionResult Search(string query)
-    {
-        // Unsafe: concatenating user input into a query-like string
-        var sql = "SELECT * FROM Items WHERE Name LIKE '%" + query + "%'";
-        return Ok(new { warning = $"This would have executed this query: '{ sql}'", sql });
-    }
+    //[HttpGet("search")]
+    //public ActionResult Search(string query)
+    //{
+    //    // Unsafe: concatenating user input into a query-like string
+    //    var sql = "SELECT * FROM Items WHERE Name LIKE '%" + query + "%'";
+    //    return Ok(new { warning = $"This would have executed this query: '{ sql}'", sql });
+    //}
 
 }
 
