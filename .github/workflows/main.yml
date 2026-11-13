@@ -23,7 +23,7 @@ jobs:
         env:
           DEMO_SECRET: ${{ secrets.MYSECRET }}
         run: |
-          echo "The secret value is: $DEMO_SECRET
+          echo "The secret value is: $DEMO_SECRET"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
