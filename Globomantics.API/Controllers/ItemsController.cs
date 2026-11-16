@@ -2,8 +2,6 @@ using Azure.Core;
 using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.IO;
-
 namespace SampleApi.Controllers;
 
 [ApiController]
@@ -20,8 +18,20 @@ public class ItemsController : ControllerBase
     public IActionResult ReadFile(string path)
     {
         // BAD: user-controlled path
-        var content = File.ReadAllText(path);
+        var content = System.IO.File.ReadAllText(path);
         return Ok(content);
+    }
+
+    [HttpGet("search")]
+    public IActionResult Search(string name)
+    {
+        var query = "SELECT * FROM Items WHERE Name LIKE '%" + name + "%'";
+
+        using var conn = new SqlConnection("Server=.;Database=dummy;Trusted_Connection=True;");
+        using var cmd = new SqlCommand(query, conn);   // ← this is the sink CodeQL watches
+                                                       // cmd.ExecuteReader(); // optional, not required for the alert
+
+        return Ok();
     }
 
     [HttpGet]
