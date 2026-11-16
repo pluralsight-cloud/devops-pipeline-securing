@@ -11,7 +11,6 @@ public class ItemsController : ControllerBase
 {
     const string PRODUCTION_PASSWORD = "myP2ssword!";
 
-    // In-memory store for the sample
     private static readonly List<Item> _items = new()
     {
         new Item { Id = 1, Name = "Widget", Quantity = 10 },
