@@ -2,6 +2,7 @@ using Azure.Core;
 using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.IO;
 
 namespace SampleApi.Controllers;
 
@@ -15,12 +16,12 @@ public class ItemsController : ControllerBase
         new Item { Id = 2, Name = "Gadget", Quantity = 5 }
     };
 
-    [HttpGet("search")]
-    public IActionResult Search(string name)
+    [HttpGet("read")]
+    public IActionResult ReadFile(string path)
     {
-        var sql = "SELECT * FROM Items WHERE Name LIKE '%" + name + "%'";
-        // pretend this gets executed
-        return Ok(new { query = sql });
+        // BAD: user-controlled path
+        var content = File.ReadAllText(path);
+        return Ok(content);
     }
 
     [HttpGet]
