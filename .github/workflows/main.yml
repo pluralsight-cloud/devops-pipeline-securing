@@ -1,4 +1,4 @@
-name: CI – Simple Threat Mitigation Demo
+name: CI - Combined build and analysis workflow
 
 permissions:
   contents: read
