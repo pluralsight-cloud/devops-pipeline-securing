@@ -1,4 +1,7 @@
+using Azure.Core;
+using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace SampleApi.Controllers;
 
@@ -6,6 +9,8 @@ namespace SampleApi.Controllers;
 [Route("api/[controller]")]
 public class ItemsController : ControllerBase
 {
+    const string PRODUCTION_PASSWORD = "myP2ssword!";
+
     // In-memory store for the sample
     private static readonly List<Item> _items = new()
     {
@@ -18,6 +23,45 @@ public class ItemsController : ControllerBase
     {
         return Ok(_items);
     }
+
+    [HttpGet("test-mi-connection")]
+    public async Task<IActionResult> TestManagedIdentityConnection()
+    {
+        // Replace with your actual server + database
+        const string connectionString =
+            "Server=tcp:sql-globomantics-38d31a.database.windows.net,1433;" +
+            "Database=GlobomanticsDb;" +
+            "Encrypt=True;" +
+            "TrustServerCertificate=False;" +
+            "Connection Timeout=30;";
+
+        try
+        {
+            // DefaultAzureCredential will use the system-assigned (or user-assigned) 
+            // Managed Identity when running in Azure App Service / Container Apps / etc.
+            var credential = new DefaultAzureCredential();
+
+            var token = await credential.GetTokenAsync(
+                new TokenRequestContext(new[] { "https://database.windows.net/.default" }));
+
+            await using var connection = new SqlConnection(connectionString);
+            connection.AccessToken = token.Token;
+
+            await connection.OpenAsync();   // <-- this is the only thing that matters for the demo
+
+            return Ok("Successfully connected to SQL Database using Managed Identity.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "Connection failed",
+                error = ex.Message,
+                type = ex.GetType().Name
+            });
+        }
+    }
+
 
     [HttpGet("{id}")]
     public ActionResult<Item> GetById(int id)

@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant W as Workload<br/>(pipeline / app)
+    participant TS as Token Service<br/>(STS / IdP)
+    participant R as Resource<br/>(API / cloud service)
+
+    Note over W: Needs access.<br/>No long-lived secret stored.
+
+    W->>TS: Authenticate<br/>(OIDC assertion / managed identity / federated credential)
+    TS-->>W: Short-lived token<br/>(TTL minutes–hours, scoped)
+    Note over W: Token held only in memory
+
+    W->>R: Request + short-lived token
+    R-->>W: Response
+
+    Note over W: Discard token immediately<br/>(clear from memory / let expire)
