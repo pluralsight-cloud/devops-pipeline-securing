@@ -423,3 +423,5 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+/Globomantics.API/Properties/serviceDependencies.app-globomantics-c41b31 - Zip Deploy.json
+/Globomantics.API/Properties/ServiceDependencies/app-globomantics-c41b31 - Zip Deploy/apis1.arm.json
