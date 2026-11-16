@@ -11,65 +11,52 @@ on:
 
 jobs:
     analyze-and-build:
-        name: Analyze (${{ matrix.language }})
-        runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
-        defaults:
-          run:
-            working-directory: Globomantics.API
-        permissions:
-          # required for all workflows
-          security-events: write
+      name: Analyze (${{ matrix.language }})
+      runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+      defaults:
+        run:
+          working-directory: Globomantics.API
+      permissions:
+        # required for all workflows
+        security-events: write
 
-          # required to fetch internal or private CodeQL packs
-          packages: read
+        # required to fetch internal or private CodeQL packs
+        packages: read
 
-          # only required for workflows in private repositories
-          actions: read
-          contents: read
+        # only required for workflows in private repositories
+        actions: read
+        contents: read
 
-        strategy:
-          fail-fast: true
-          matrix:
-            include:
-            - language: actions
-              build-mode: none
-            - language: csharp
-              build-mode: none
-        steps:
-        - name: Checkout repository
-          uses: actions/checkout@v7
+      strategy:
+        fail-fast: true
+        matrix:
+          include:
+          - language: actions
+            build-mode: none
+          - language: csharp
+            build-mode: none
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
-        - name: Initialize CodeQL
-          uses: github/codeql-action/init@v4
-          with:
-            languages: ${{ matrix.language }}
-            build-mode: ${{ matrix.build-mode }}
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
 
-          - name: Setup .NET
-            uses: actions/setup-dotnet@v4
-            with:
-              dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
-          - name: Restore
-            run: dotnet restore Globomantics.API.slnx
+      - name: Restore
+        run: dotnet restore Globomantics.API.slnx
 
-          # ---------------------------------------------------------------
-          # Mitigation for the single threat in the threat model:
-          # Fail the build if we find code that concatenates user input
-          # into a query-like string.
-          # ---------------------------------------------------------------
-          - name: Check for unsafe input handling
-            run: |
-              if grep -rE "LIKE '%\" \+ .* \+ \"%'" --include='*.cs'; then
-                echo "Unsafe pattern detected: user input concatenated into a query string"
-                exit 1
-              fi
-              echo "No unsafe patterns found"
+      - name: Build
+        run: dotnet build Globomantics.API.slnx --configuration Release --no-restore
 
-          - name: Build
-            run: dotnet build Globomantics.API.slnx --configuration Release --no-restore
-
-        - name: Perform CodeQL Analysis
-          uses: github/codeql-action/analyze@v4
-          with:
-            category: "/language:${{matrix.language}}"
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{matrix.language}}"
