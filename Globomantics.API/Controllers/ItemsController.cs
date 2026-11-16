@@ -14,6 +14,17 @@ public class ItemsController : ControllerBase
         new Item { Id = 2, Name = "Gadget", Quantity = 5 }
     };
 
+    [HttpGet("demo")]
+    public IActionResult Demo()
+    {
+        var items = new List<string> { "a", "b", "c" };
+
+        // Minor: redundant Select (identity projection)
+        var result = items.Select(x => x).Where(x => x.Length > 0).ToList();
+
+        return Ok(result);
+    }
+
     [HttpGet("read")]
     public IActionResult ReadFile(string path)
     {
