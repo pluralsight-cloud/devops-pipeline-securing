@@ -14,15 +14,13 @@ public class ItemsController : ControllerBase
         new Item { Id = 2, Name = "Gadget", Quantity = 5 }
     };
 
-    [HttpGet("demo")]
-    public IActionResult Demo()
+    [HttpGet("token")]
+    public IActionResult GetToken()
     {
-        var items = new List<string> { "a", "b", "c" };
-
-        // Minor: redundant Select (identity projection)
-        var result = items.Select(x => x).Where(x => x.Length > 0).ToList();
-
-        return Ok(result);
+        // Triggers cs/insecure-randomness (usually Medium)
+        var rng = new Random();
+        var token = rng.Next().ToString();
+        return Ok(token);
     }
 
     [HttpGet("read")]
