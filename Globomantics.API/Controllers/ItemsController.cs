@@ -9,13 +9,19 @@ namespace SampleApi.Controllers;
 [Route("api/[controller]")]
 public class ItemsController : ControllerBase
 {
-    const string PRODUCTION_PASSWORD = "myP2ssword!";
-
     private static readonly List<Item> _items = new()
     {
         new Item { Id = 1, Name = "Widget", Quantity = 10 },
         new Item { Id = 2, Name = "Gadget", Quantity = 5 }
     };
+
+    [HttpGet("search")]
+    public IActionResult Search(string name)
+    {
+        var sql = "SELECT * FROM Items WHERE Name LIKE '%" + name + "%'";
+        // pretend this gets executed
+        return Ok(new { query = sql });
+    }
 
     [HttpGet]
     public ActionResult<IEnumerable<Item>> Get()
