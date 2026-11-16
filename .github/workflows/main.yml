@@ -10,41 +10,66 @@ on:
     branches: [main]
 
 jobs:
-  build-and-check:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Globomantics.API
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+    analyze-and-build:
+        name: Analyze (${{ matrix.language }})
+        runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+        defaults:
+          run:
+            working-directory: Globomantics.API
+        permissions:
+          # required for all workflows
+          security-events: write
 
-      - name: Echo the secret
-        env:
-          DEMO_SECRET: ${{ secrets.MYSECRET }}
-        run: |
-          echo "The secret value is: $DEMO_SECRET"
+          # required to fetch internal or private CodeQL packs
+          packages: read
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+          # only required for workflows in private repositories
+          actions: read
+          contents: read
 
-      - name: Restore
-        run: dotnet restore Globomantics.API.slnx
+        strategy:
+          fail-fast: true
+          matrix:
+            include:
+            - language: actions
+              build-mode: none
+            - language: csharp
+              build-mode: none
+        steps:
+        - name: Checkout repository
+          uses: actions/checkout@v7
 
-      # ---------------------------------------------------------------
-      # Mitigation for the single threat in the threat model:
-      # Fail the build if we find code that concatenates user input
-      # into a query-like string.
-      # ---------------------------------------------------------------
-      - name: Check for unsafe input handling
-        run: |
-          if grep -rE "LIKE '%\" \+ .* \+ \"%'" --include='*.cs'; then
-            echo "Unsafe pattern detected: user input concatenated into a query string"
-            exit 1
-          fi
-          echo "No unsafe patterns found"
+        - name: Initialize CodeQL
+          uses: github/codeql-action/init@v4
+          with:
+            languages: ${{ matrix.language }}
+            build-mode: ${{ matrix.build-mode }}
 
-      - name: Build
-        run: dotnet build Globomantics.API.slnx --configuration Release --no-restore
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v4
+            with:
+              dotnet-version: '8.0.x'
+
+          - name: Restore
+            run: dotnet restore Globomantics.API.slnx
+
+          # ---------------------------------------------------------------
+          # Mitigation for the single threat in the threat model:
+          # Fail the build if we find code that concatenates user input
+          # into a query-like string.
+          # ---------------------------------------------------------------
+          - name: Check for unsafe input handling
+            run: |
+              if grep -rE "LIKE '%\" \+ .* \+ \"%'" --include='*.cs'; then
+                echo "Unsafe pattern detected: user input concatenated into a query string"
+                exit 1
+              fi
+              echo "No unsafe patterns found"
+
+          - name: Build
+            run: dotnet build Globomantics.API.slnx --configuration Release --no-restore
+
+        - name: Perform CodeQL Analysis
+          uses: github/codeql-action/analyze@v4
+          with:
+            category: "/language:${{matrix.language}}"
