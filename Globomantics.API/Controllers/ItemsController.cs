@@ -14,6 +14,13 @@ public class ItemsController : ControllerBase
         new Item { Id = 2, Name = "Gadget", Quantity = 5 }
     };
 
+    public static void Reset()
+    {
+        _items.Clear();
+        _items.Add(new Item { Id = 1, Name = "Widget", Quantity = 10 });
+        _items.Add(new Item { Id = 2, Name = "Gadget", Quantity = 5 }); 
+    }
+
     [HttpGet("token")]
     public IActionResult GetToken()
     {
