@@ -7,6 +7,19 @@ namespace Globomantics.API.Tests;
 public class ItemsControllerGoodTests : ItemsControllerTestBase
 {
     [Fact]
+    public void GetToken_returns_an_ok_result_containing_a_random_integer()
+    {
+        var controller = new ItemsController();
+
+        var result = controller.GetToken();
+
+        var response = Assert.IsType<OkObjectResult>(result);
+        var token = Assert.IsType<string>(response.Value);
+        Assert.True(int.TryParse(token, out var value));
+        Assert.InRange(value, 0, int.MaxValue);
+    }
+
+    [Fact]
     public void Get_returns_the_seeded_items()
     {
         var controller = new ItemsController();
